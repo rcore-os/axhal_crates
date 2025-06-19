@@ -18,13 +18,13 @@ mod config {
     axconfig_macros::include_configs!(path_env = "AX_CONFIG_PATH", fallback = "axconfig.toml");
 }
 
+// Use `.data` section to prevent being cleaned by `clean_bss`.
+#[unsafe(link_section = ".data")]
 static BOOT_INFO: Once<BootInfo> = Once::new();
 
 #[pie_boot::entry]
 fn main(args: &BootInfo) -> ! {
     BOOT_INFO.call_once(move || args.clone());
-
-    mem::setup();
 
     axplat::call_main(
         args.cpu_id,
