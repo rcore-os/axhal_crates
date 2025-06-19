@@ -11,7 +11,7 @@ version = "0.1.0"
 [dependencies]
 axconfig-macros = "0.2"
 axplat = {git = "https://github.com/arceos-org/axplat_crates"}
-pie-boot = {version = "0.2.1"}
+pie-boot = {version = "0.2.2"}
 any-uart = "0.2.11"
 spin = "0.10"
 axcpu = { workspace = true }
