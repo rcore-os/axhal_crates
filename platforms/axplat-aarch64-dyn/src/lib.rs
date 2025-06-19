@@ -1,10 +1,10 @@
-#![cfg(all(target_arch = "aarch64", target_os = "none"))]
+#![cfg(target_arch = "aarch64")]
 #![no_std]
 
 #[macro_use]
 extern crate axplat;
 
-use pie_boot::BootArgs;
+use pie_boot::BootInfo;
 
 mod console;
 mod init;
@@ -18,7 +18,7 @@ mod config {
 }
 
 #[pie_boot::entry]
-fn main(_args: &BootArgs) -> ! {
+fn main(args: &BootInfo) -> ! {
     // TODO: Implement actual bootstrap logic
-    axplat::call_main(0, 0);
+    axplat::call_main(args.cpu_id, args.fdt.map(|p| p.as_ptr() as usize).unwrap_or_default());
 }
