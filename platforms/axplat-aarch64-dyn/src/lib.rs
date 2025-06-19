@@ -5,6 +5,7 @@
 extern crate axplat;
 
 use pie_boot::BootInfo;
+use spin::Once;
 
 mod console;
 mod init;
@@ -17,8 +18,20 @@ mod config {
     axconfig_macros::include_configs!(path_env = "AX_CONFIG_PATH", fallback = "axconfig.toml");
 }
 
+static BOOT_INFO: Once<BootInfo> = Once::new();
+
 #[pie_boot::entry]
 fn main(args: &BootInfo) -> ! {
-    // TODO: Implement actual bootstrap logic
-    axplat::call_main(args.cpu_id, args.fdt.map(|p| p.as_ptr() as usize).unwrap_or_default());
+    BOOT_INFO.call_once(move || args.clone());
+
+    mem::setup();
+
+    axplat::call_main(
+        args.cpu_id,
+        args.fdt.map(|p| p.as_ptr() as usize).unwrap_or_default(),
+    );
+}
+
+fn boot_info() -> &'static BootInfo {
+    BOOT_INFO.wait()
 }
