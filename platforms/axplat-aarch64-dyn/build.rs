@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 fn main() {
     println!("cargo:rerun-if-env-changed=AX_CONFIG_PATH");
     if let Ok(config_path) = std::env::var("AX_CONFIG_PATH") {

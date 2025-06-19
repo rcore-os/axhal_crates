@@ -1584,7 +1584,7 @@ checksum = "01e56c0c558952222967b592899f98765b48590e7bd7403bfd7075f73afc6ed6"
 dependencies = [
  "cfg-if",
  "percpu_macros",
- "spin",
+ "spin 0.9.8",
  "x86",
 ]
 
@@ -1601,11 +1601,13 @@ dependencies = [
 
 [[package]]
 name = "pie-boot"
-version = "0.1.11"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4022756aae564d454e6e3818ca5256f2c194552233d2f3c234ec54fb9ea14772"
+checksum = "18a38f67a4f0420817c4d69752ed81e97947ab7d88164a50508e7964f8d26996"
 dependencies = [
  "bindeps-simple",
+ "fdt-parser",
+ "heapless",
  "kasm-aarch64",
  "kdef-pgtable",
  "pie-boot-if",
@@ -1615,15 +1617,15 @@ dependencies = [
 
 [[package]]
 name = "pie-boot-if"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a3efc1049fcf115b4fe598a618fd31eb73a3253ebe86c275806affb2ecc9a5a"
+checksum = "f9acf510d796dc5528db0428e6cf9097a97bd06d3e284117d8b7604f424e41f5"
 
 [[package]]
 name = "pie-boot-loader-aarch64"
-version = "0.1.11"
+version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ff186f379c4b2afdc984e168d1cbdbb0e346344d9eed48baa28f406b56551d8"
+checksum = "03d8f496ee984ac2a573044726af41b99a75d429fe2c8dc6ebddcdfda06f12cc"
 dependencies = [
  "aarch64-cpu",
  "any-uart",
@@ -1637,6 +1639,7 @@ dependencies = [
  "pie-boot-if",
  "prettyplease",
  "quote",
+ "spin 0.10.0",
  "syn",
  "thiserror 2.0.12",
 ]
@@ -2147,6 +2150,15 @@ name = "spin"
 version = "0.9.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
+dependencies = [
+ "lock_api",
+]
+
+[[package]]
+name = "spin"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d5fe4ccb98d9c292d56fec89a5e07da7fc4cf0dc11e156b41793132775d3e591"
 dependencies = [
  "lock_api",
 ]
