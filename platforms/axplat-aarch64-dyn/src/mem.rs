@@ -1,9 +1,7 @@
 use axplat::mem::{MemIf, RawRange};
 use heapless::Vec;
-use pie_boot::MemoryRegionKind;
+use pie_boot::{MemoryRegionKind, boot_info};
 use spin::{Mutex, Once};
-
-use crate::boot_info;
 
 struct MemIfImpl;
 

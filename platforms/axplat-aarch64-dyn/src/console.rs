@@ -3,9 +3,8 @@ use core::ptr::NonNull;
 use any_uart::{Receiver, Sender};
 use axplat::console::ConsoleIf;
 use fdt_parser::Fdt;
+use pie_boot::boot_info;
 use spin::Mutex;
-
-use crate::boot_info;
 
 static TX: Mutex<Option<Sender>> = Mutex::new(None);
 static RX: Mutex<Option<Receiver>> = Mutex::new(None);
@@ -74,7 +73,7 @@ fn getchar() -> Option<u8> {
     let mut g = RX.lock();
     if let Some(rx) = g.as_mut() {
         any_uart::block!(rx.read()).ok()
-    }else{
+    } else {
         None
     }
 }
