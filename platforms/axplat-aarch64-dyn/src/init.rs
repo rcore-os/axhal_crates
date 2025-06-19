@@ -32,6 +32,7 @@ impl InitIf for InitIfImpl {
     /// * Current monotonic time and wall time can be obtained.
     fn init_early(cpu_id: usize, arg: usize) {
         axcpu::init::init_trap();
+        crate::mem::setup();
         console::setup_early();
     }
 
