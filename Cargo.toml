@@ -18,6 +18,7 @@ members = [
     "examples/hello-kernel",
     "examples/irq-kernel",
     "examples/smp-kernel",
+    "examples/hello-kernel", "platforms/axplat-aarch64-dyn",
 ]
 
 [workspace.package]
