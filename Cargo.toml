@@ -15,7 +15,7 @@ members = [
     "platforms/axplat-riscv64-qemu-virt",
     "platforms/axplat-loongarch64-qemu-virt",
 
-    "examples/hello-kernel",
+    "examples/hello-kernel", "platforms/axplat-aarch64-dyn",
 ]
 
 [workspace.package]
