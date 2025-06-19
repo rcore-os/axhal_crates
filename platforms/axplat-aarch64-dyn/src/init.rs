@@ -1,5 +1,7 @@
 use axplat::init::InitIf;
 
+use crate::console;
+
 struct InitIfImpl;
 
 #[impl_plat_interface]
@@ -29,14 +31,15 @@ impl InitIf for InitIfImpl {
     /// * Early console is initialized.
     /// * Current monotonic time and wall time can be obtained.
     fn init_early(cpu_id: usize, arg: usize) {
-        todo!()
+        axcpu::init::init_trap();
+        console::setup_early();
     }
 
     /// Initializes the platform at the early stage for secondary cores.
     ///
     /// See [`init_early`] for details.
     fn init_early_secondary(cpu_id: usize) {
-        todo!()
+        axcpu::init::init_trap();
     }
 
     /// Initializes the platform at the later stage for the primary core.

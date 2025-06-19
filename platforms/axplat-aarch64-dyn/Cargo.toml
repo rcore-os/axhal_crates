@@ -12,3 +12,8 @@ version = "0.1.0"
 axconfig-macros = "0.2"
 axplat = {git = "https://github.com/arceos-org/axplat_crates"}
 pie-boot = {version = "0.2.1"}
+any-uart = "0.2.11"
+spin = "0.10"
+axcpu = { workspace = true }
+heapless = "0.8"
+fdt-parser = "0.4"

@@ -1,6 +1,48 @@
 use axplat::mem::{MemIf, RawRange};
+use heapless::Vec;
+use pie_boot::MemoryRegionKind;
+use spin::{Mutex, Once};
+
+use crate::boot_info;
 
 struct MemIfImpl;
+
+static RAM_LIST: Once<Vec<RawRange, 32>> = Once::new();
+static RESERVED_LIST: Once<Vec<RawRange, 32>> = Once::new();
+static MMIO: Mutex<Vec<RawRange, 32>> = Mutex::new(Vec::new());
+
+pub fn setup() {
+    RAM_LIST.call_once(|| {
+        let mut ram_list = Vec::new();
+        for region in boot_info()
+            .memory_regions
+            .iter()
+            .filter(|one| matches!(one.kind, MemoryRegionKind::Ram))
+            .map(|one| (one.start, one.end - one.start))
+        {
+            let _ = ram_list.push(region);
+        }
+        ram_list
+    });
+
+    RESERVED_LIST.call_once(|| {
+        let mut ram_list = Vec::new();
+        for region in boot_info()
+            .memory_regions
+            .iter()
+            .filter(|one| {
+                matches!(
+                    one.kind,
+                    MemoryRegionKind::Reserved | MemoryRegionKind::Bootloader
+                )
+            })
+            .map(|one| (one.start, one.end - one.start))
+        {
+            let _ = ram_list.push(region);
+        }
+        ram_list
+    });
+}
 
 #[impl_plat_interface]
 impl MemIf for MemIfImpl {
@@ -9,7 +51,7 @@ impl MemIf for MemIfImpl {
     /// All memory ranges except reserved ranges (including the kernel loaded
     /// range) are free for allocation.
     fn phys_ram_ranges() -> &'static [RawRange] {
-        todo!()
+        RAM_LIST.wait()
     }
 
     /// Returns all reserved physical memory ranges on the platform.
@@ -20,11 +62,11 @@ impl MemIf for MemIfImpl {
     /// Note that the ranges returned should not include the range where the
     /// kernel is loaded.
     fn reserved_phys_ram_ranges() -> &'static [RawRange] {
-        todo!()
+        RESERVED_LIST.wait()
     }
 
     /// Returns all device memory (MMIO) ranges on the platform.
     fn mmio_ranges() -> &'static [RawRange] {
-        todo!()
+        &[]
     }
 }

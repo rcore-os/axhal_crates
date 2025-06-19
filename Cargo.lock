@@ -223,9 +223,14 @@ dependencies = [
 name = "axplat-aarch64-dyn"
 version = "0.1.0"
 dependencies = [
+ "any-uart",
  "axconfig-macros",
+ "axcpu",
  "axplat 0.1.0 (git+https://github.com/arceos-org/axplat_crates)",
+ "fdt-parser",
+ "heapless",
  "pie-boot",
+ "spin 0.10.0",
 ]
 
 [[package]]
@@ -377,9 +382,9 @@ checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
 name = "bindeps-simple"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c552605dcd6215ece07bc195ce67a10f10e4059e1c7dee5cc481848a94a4ae11"
+checksum = "0e01011a06c75860d7aae8bc27d6cbcf55024a97497a4a4301e3c062f1aaf46f"
 dependencies = [
  "anyhow",
  "cargo_metadata",
