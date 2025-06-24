@@ -382,9 +382,9 @@ checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
 name = "bindeps-simple"
-version = "0.2.4"
+version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0787d6e8a68db4948ed3378f3f2960a5d8cbd027817a69d6993051d77e075b4f"
+checksum = "759b427caeff86cb964340e5fee96d7b26a58853941d3a8e051f46be7b1fada3"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -1256,9 +1256,9 @@ dependencies = [
 
 [[package]]
 name = "kdef-pgtable"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88c375019f3f1b03ddbe5bfdb3742cced72a31cfc6eee1d666a5fe8a3361c757"
+checksum = "e679d999335b7055935ae9cd13aac3116e54d5cfb127cb9b53791e08ef63306b"
 dependencies = [
  "bitflags 2.9.1",
  "prettyplease",
@@ -1606,9 +1606,9 @@ dependencies = [
 
 [[package]]
 name = "pie-boot"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d2d337cb8541ccde64a5232eff9ec4c83286f7f9afee44013a9edfe7c1cc1a6"
+checksum = "fa53b09c2a2c6475a8d19a7c0c2a60b302b43119bc322b0c7f93cb750d9c1654"
 dependencies = [
  "bindeps-simple",
  "fdt-parser",
@@ -1622,15 +1622,15 @@ dependencies = [
 
 [[package]]
 name = "pie-boot-if"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9acf510d796dc5528db0428e6cf9097a97bd06d3e284117d8b7604f424e41f5"
+checksum = "3e5905396f9d1f5f775d22bc963bb7d60f809931b68f5e4155b9db9855a5ad15"
 
 [[package]]
 name = "pie-boot-loader-aarch64"
-version = "0.1.12"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "03d8f496ee984ac2a573044726af41b99a75d429fe2c8dc6ebddcdfda06f12cc"
+checksum = "744d8a06dde13ed05cbaa5dd1b8f69454afee00f1f3177f93f76e764540fea63"
 dependencies = [
  "aarch64-cpu",
  "any-uart",
