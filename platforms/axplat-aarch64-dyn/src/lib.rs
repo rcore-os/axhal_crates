@@ -5,7 +5,6 @@
 extern crate axplat;
 
 use pie_boot::BootInfo;
-use spin::Once;
 
 mod console;
 mod init;

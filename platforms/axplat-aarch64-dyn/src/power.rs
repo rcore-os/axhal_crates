@@ -1,3 +1,4 @@
+use aarch64_cpu::asm::wfi;
 use axplat::power::PowerIf;
 
 struct PowerImpl;
@@ -15,6 +16,8 @@ impl PowerIf for PowerImpl {
 
     /// Shutdown the whole system.
     fn system_off() -> ! {
-        todo!()
+        loop {
+            wfi();
+        }
     }
 }

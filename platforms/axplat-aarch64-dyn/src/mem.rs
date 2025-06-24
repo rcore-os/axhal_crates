@@ -1,6 +1,9 @@
+use core::ops::Range;
+
 use axplat::mem::{MemIf, RawRange};
 use heapless::Vec;
-use pie_boot::{MemoryRegionKind, boot_info};
+use memory_addr::{PhysAddr, VirtAddr};
+use pie_boot::{KIMAGE_VADDR, KLINER_OFFSET, MemoryRegionKind, boot_info};
 use spin::{Mutex, Once};
 
 struct MemIfImpl;
@@ -67,4 +70,31 @@ impl MemIf for MemIfImpl {
     fn mmio_ranges() -> &'static [RawRange] {
         &[]
     }
+
+    fn phys_to_virt(p: PhysAddr) -> VirtAddr {
+        if kimage_range_phys().contains(&p) {
+            VirtAddr::from_usize(p.as_usize() + KIMAGE_VADDR)
+        } else {
+            // MMIO or other reserved regions
+            VirtAddr::from_usize(p.as_usize() + KLINER_OFFSET)
+        }
+    }
+    fn virt_to_phys(p: VirtAddr) -> PhysAddr {
+        if (KIMAGE_VADDR..KLINER_OFFSET).contains(&p.as_usize()) {
+            PhysAddr::from_usize(p.as_usize() - KIMAGE_VADDR)
+        } else {
+            PhysAddr::from_usize(p.as_usize() - KLINER_OFFSET)
+        }
+    }
+}
+
+fn kimage_range_phys() -> Range<PhysAddr> {
+    unsafe extern "C" {
+        fn _skernel();
+        fn _ekernel();
+    }
+
+    let start = PhysAddr::from_usize(_skernel as usize - KIMAGE_VADDR);
+    let end = PhysAddr::from_usize(_ekernel as usize - KIMAGE_VADDR);
+    start..end
 }
