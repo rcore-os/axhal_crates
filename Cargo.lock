@@ -242,7 +242,7 @@ dependencies = [
  "arm_pl011",
  "arm_pl031",
  "axcpu",
- "axplat 0.1.0",
+ "axplat",
  "int_ratio",
  "kspin",
  "lazyinit",
@@ -293,7 +293,7 @@ version = "0.1.0"
 dependencies = [
  "axconfig-macros",
  "axcpu",
- "axplat 0.1.0",
+ "axplat",
  "chrono",
  "kspin",
  "lazyinit",
@@ -314,22 +314,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "axplat-macros"
-version = "0.1.0"
-source = "git+https://github.com/arceos-org/axplat_crates#ae33d2f94e690833c7ae11c9d94dff624fe864d3"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "axplat-riscv64-qemu-virt"
 version = "0.1.0"
 dependencies = [
  "axconfig-macros",
  "axcpu",
- "axplat 0.1.0",
+ "axplat",
  "log",
  "riscv 0.14.0",
  "riscv_goldfish",
@@ -342,7 +332,7 @@ version = "0.1.0"
 dependencies = [
  "axconfig-macros",
  "axcpu",
- "axplat 0.1.0",
+ "axplat",
  "bitflags 2.9.1",
  "heapless",
  "int_ratio",
@@ -738,9 +728,9 @@ checksum = "37909eebbb50d72f9059c3b6d82c0463f2ff062c9e95845c43a6c9c0355411be"
 
 [[package]]
 name = "fdt-parser"
-version = "0.4.16"
+version = "0.4.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d09dfa244d6891db105eefae4f3aa5752adcab254a95e24c17c3ebd76f6d77ba"
+checksum = "16ca123a5721e4a28ef60d6e1600cd0a33a9ab376c4b88de04c99bce757e458b"
 
 [[package]]
 name = "filetime"
@@ -934,7 +924,7 @@ name = "hello-kernel"
 version = "0.1.0"
 dependencies = [
  "axcpu",
- "axplat 0.1.0",
+ "axplat",
  "axplat-aarch64-qemu-virt",
  "axplat-loongarch64-qemu-virt",
  "axplat-riscv64-qemu-virt",
@@ -1606,9 +1596,9 @@ dependencies = [
 
 [[package]]
 name = "pie-boot"
-version = "0.2.3"
+version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa53b09c2a2c6475a8d19a7c0c2a60b302b43119bc322b0c7f93cb750d9c1654"
+checksum = "2510a44c6c2cc031f6ecdda20e2cc1806585d3abd977936a6db1011b96046b55"
 dependencies = [
  "bindeps-simple",
  "fdt-parser",
@@ -1628,9 +1618,9 @@ checksum = "3e5905396f9d1f5f775d22bc963bb7d60f809931b68f5e4155b9db9855a5ad15"
 
 [[package]]
 name = "pie-boot-loader-aarch64"
-version = "0.1.13"
+version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "744d8a06dde13ed05cbaa5dd1b8f69454afee00f1f3177f93f76e764540fea63"
+checksum = "1329e45b46cfe27641b6b3fcee7861492d6011208ca678e4bd679d1f4edd36fb"
 dependencies = [
  "aarch64-cpu",
  "any-uart",
@@ -1699,9 +1689,9 @@ dependencies = [
 
 [[package]]
 name = "prettyplease"
-version = "0.2.34"
+version = "0.2.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6837b9e10d61f45f987d50808f83d1ee3d206c66acf650c3e4ae2e1f6ddedf55"
+checksum = "061c1221631e079b26479d25bbf2275bfe5917ae8419cd7e34f13bfc2aa7539a"
 dependencies = [
  "proc-macro2",
  "syn",
@@ -2672,9 +2662,9 @@ checksum = "5e6ad25900d524eaabdbbb96d20b4311e1e7ae1699af4fb28c17ae66c80d798a"
 
 [[package]]
 name = "windows-registry"
-version = "0.5.2"
+version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b3bab093bdd303a1240bb99b8aba8ea8a69ee19d34c9e2ef9594e708a4878820"
+checksum = "5b8a9ed28765efc97bbc954883f4e6796c33a06546ebafacbabee9696967499e"
 dependencies = [
  "windows-link",
  "windows-result",
