@@ -123,6 +123,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "as-any"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0f477b951e452a0b6b4a10b53ccd569042d1d01729b519e02074a9c0958a063"
+
+[[package]]
+name = "async-trait"
+version = "0.1.88"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e539d3fca749fcee5236ab05e93a52867dd549cc157c8cb7f99595f3cedffdb5"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -230,6 +247,8 @@ dependencies = [
  "fdt-parser",
  "heapless",
  "pie-boot",
+ "rdrive",
+ "smccc",
  "spin 0.10.0",
 ]
 
@@ -695,6 +714,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "enum_dispatch"
+version = "0.3.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa18ce2bc66555b3218614519ac839ddb759a7d6720732f979ef8d13be147ecd"
+dependencies = [
+ "once_cell",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "equivalent"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -782,6 +813,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e13624c2627564efccf4934284bdd98cbaa14e79b0b5a141218e507b3a823456"
 dependencies = [
  "percent-encoding",
+]
+
+[[package]]
+name = "futures"
+version = "0.3.31"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "65bc07b1a8bc7c85c5f2e110c476c7389b4554ba72af57d8445ea63a576b0876"
+dependencies = [
+ "futures-channel",
+ "futures-core",
+ "futures-io",
+ "futures-sink",
+ "futures-task",
+ "futures-util",
 ]
 
 [[package]]
@@ -1596,9 +1641,9 @@ dependencies = [
 
 [[package]]
 name = "pie-boot"
-version = "0.2.6"
+version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "91b35f08d34ae5d86e30af6231b26b37c16ddffcd3d7b96841b4dabefcbeb41b"
+checksum = "06b6bcb9cde9eff97558cc34c1c79d02644b1e441c37785d981ebd3c95b51fd5"
 dependencies = [
  "bindeps-simple",
  "fdt-parser",
@@ -1621,9 +1666,9 @@ dependencies = [
 
 [[package]]
 name = "pie-boot-loader-aarch64"
-version = "0.1.15"
+version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1edf25b981706728b509671cc4067801cce03d6447407ce4ecff8e111455219d"
+checksum = "87c14dd9650035eed0695f9097d98d0ef0f6e09e6dbbafad5a893f45f4b4a6f5"
 dependencies = [
  "aarch64-cpu",
  "any-uart",
@@ -1769,6 +1814,120 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c6df7ab838ed27997ba19a4664507e6f82b41fe6e20be42929332156e5e85146"
 dependencies = [
  "bitflags 2.9.1",
+]
+
+[[package]]
+name = "rdif-base"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b6953f438bbbdf58e55513c31e70fa0f85daba2927e8a59130a04608141bb552"
+dependencies = [
+ "as-any",
+ "async-trait",
+ "rdif-def",
+ "thiserror 2.0.12",
+]
+
+[[package]]
+name = "rdif-block"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c7b8e19dc3cb6cd7241085a9560a91d4346edbc525bcbfc3c86e5eeb11559c19"
+dependencies = [
+ "cfg-if",
+ "rdif-base",
+]
+
+[[package]]
+name = "rdif-clk"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ee94bb098e921346fffa3bb8d18e80fbb903c8ad2cb0a103ee9a65ae1a7d77fa"
+dependencies = [
+ "rdif-base",
+]
+
+[[package]]
+name = "rdif-def"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c238eb44d86fabc99028adc973f896ce2202aeb6184cc8b89863f2d157d7ca06"
+dependencies = [
+ "thiserror 2.0.12",
+]
+
+[[package]]
+name = "rdif-intc"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4e7622f78dc9b40958500119553f3c15b9bb9829002d87d0f4b114ebe302a40"
+dependencies = [
+ "cfg-if",
+ "rdif-base",
+ "thiserror 2.0.12",
+]
+
+[[package]]
+name = "rdif-power"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37eb02828548e3d1bb13d2a5d892219dfa295c3c0c00a1a647a68f947e5d070a"
+dependencies = [
+ "rdif-base",
+]
+
+[[package]]
+name = "rdif-serial"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a3381d491f588cfb20dfa661dc374411a2cb91c751b2e18516e0d2edca6a58e"
+dependencies = [
+ "futures",
+ "rdif-base",
+ "spin_on",
+ "thiserror 2.0.12",
+]
+
+[[package]]
+name = "rdif-systick"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2cdd145eab68c38f23dfcc8b3b1ed20c48bbb1a4278dd9c7bf64e9219cc61158"
+dependencies = [
+ "rdif-base",
+]
+
+[[package]]
+name = "rdrive"
+version = "0.14.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46b6f76c1c957b33cc43e377ae324fd7ab204a006204db99272bf0497a34585f"
+dependencies = [
+ "enum_dispatch",
+ "fdt-parser",
+ "log",
+ "paste",
+ "rdif-base",
+ "rdif-block",
+ "rdif-clk",
+ "rdif-intc",
+ "rdif-power",
+ "rdif-serial",
+ "rdif-systick",
+ "rdrive-macros",
+ "spin 0.10.0",
+ "thiserror 2.0.12",
+]
+
+[[package]]
+name = "rdrive-macros"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eab3105c9af32e901a2adc7d920b39ff8b6ee0f6f0b7dfdeaf18f306ec12606f"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -2159,6 +2318,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d5fe4ccb98d9c292d56fec89a5e07da7fc4cf0dc11e156b41793132775d3e591"
 dependencies = [
  "lock_api",
+]
+
+[[package]]
+name = "spin_on"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "076e103ed41b9864aa838287efe5f4e3a7a0362dd00671ae62a212e5e4612da2"
+dependencies = [
+ "pin-utils",
 ]
 
 [[package]]

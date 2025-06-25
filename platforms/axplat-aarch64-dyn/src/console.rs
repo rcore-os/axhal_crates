@@ -1,5 +1,3 @@
-use core::ptr::NonNull;
-
 use any_uart::{Receiver, Sender};
 use axplat::console::ConsoleIf;
 use fdt_parser::Fdt;
