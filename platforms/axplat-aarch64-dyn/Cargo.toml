@@ -17,5 +17,5 @@ axplat = {workspace = true}
 fdt-parser = "0.4"
 heapless = "0.8"
 memory_addr = "0.3"
-pie-boot = {version = "0.2.2"}
+pie-boot = {version = "0.2.6"}
 spin = "0.10"

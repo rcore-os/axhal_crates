@@ -1596,9 +1596,9 @@ dependencies = [
 
 [[package]]
 name = "pie-boot"
-version = "0.2.5"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2510a44c6c2cc031f6ecdda20e2cc1806585d3abd977936a6db1011b96046b55"
+checksum = "91b35f08d34ae5d86e30af6231b26b37c16ddffcd3d7b96841b4dabefcbeb41b"
 dependencies = [
  "bindeps-simple",
  "fdt-parser",
@@ -1612,15 +1612,18 @@ dependencies = [
 
 [[package]]
 name = "pie-boot-if"
-version = "0.4.1"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e5905396f9d1f5f775d22bc963bb7d60f809931b68f5e4155b9db9855a5ad15"
+checksum = "04ba4eb3bbf609c19dbfa5c705f0b96bb189f5787301d772cd360578bd4ef97b"
+dependencies = [
+ "heapless",
+]
 
 [[package]]
 name = "pie-boot-loader-aarch64"
-version = "0.1.14"
+version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1329e45b46cfe27641b6b3fcee7861492d6011208ca678e4bd679d1f4edd36fb"
+checksum = "1edf25b981706728b509671cc4067801cce03d6447407ce4ecff8e111455219d"
 dependencies = [
  "aarch64-cpu",
  "any-uart",

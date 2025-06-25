@@ -2,17 +2,26 @@ use core::ops::Range;
 
 use axplat::mem::{MemIf, RawRange};
 use heapless::Vec;
-use memory_addr::{PhysAddr, VirtAddr};
+use memory_addr::{MemoryAddr, PhysAddr, VirtAddr};
 use pie_boot::{KIMAGE_VADDR, KLINER_OFFSET, MemoryRegionKind, boot_info};
-use spin::{Mutex, Once};
+use spin::{Mutex, Once, RwLock};
 
 struct MemIfImpl;
 
 static RAM_LIST: Once<Vec<RawRange, 32>> = Once::new();
 static RESERVED_LIST: Once<Vec<RawRange, 32>> = Once::new();
-static MMIO: Mutex<Vec<RawRange, 32>> = Mutex::new(Vec::new());
+static MMIO: Once<Vec<RawRange, 32>> = Once::new();
+static mut VA_OFFSET: usize = 0;
+
+fn va_offset() -> usize {
+    unsafe { VA_OFFSET }
+}
 
 pub fn setup() {
+    unsafe {
+        VA_OFFSET = boot_info().kimage_start_vma as usize - boot_info().kimage_start_lma as usize
+    };
+
     RAM_LIST.call_once(|| {
         let mut ram_list = Vec::new();
         for region in boot_info()
@@ -28,6 +37,7 @@ pub fn setup() {
 
     RESERVED_LIST.call_once(|| {
         let mut ram_list = Vec::new();
+
         for region in boot_info()
             .memory_regions
             .iter()
@@ -42,6 +52,16 @@ pub fn setup() {
             let _ = ram_list.push(region);
         }
         ram_list
+    });
+
+    MMIO.call_once(|| {
+        let mut mmio_list = Vec::new();
+        if let Some(debug) = &boot_info().debug_console {
+            let start = (debug.base as usize).align_down_4k();
+            let _ = mmio_list.push((start, 0x1000));
+        }
+
+        mmio_list
     });
 }
 
@@ -68,12 +88,12 @@ impl MemIf for MemIfImpl {
 
     /// Returns all device memory (MMIO) ranges on the platform.
     fn mmio_ranges() -> &'static [RawRange] {
-        &[]
+        MMIO.wait()
     }
 
     fn phys_to_virt(p: PhysAddr) -> VirtAddr {
         if kimage_range_phys().contains(&p) {
-            VirtAddr::from_usize(p.as_usize() + KIMAGE_VADDR)
+            VirtAddr::from_usize(p.as_usize() + va_offset())
         } else {
             // MMIO or other reserved regions
             VirtAddr::from_usize(p.as_usize() + KLINER_OFFSET)
@@ -81,7 +101,7 @@ impl MemIf for MemIfImpl {
     }
     fn virt_to_phys(p: VirtAddr) -> PhysAddr {
         if (KIMAGE_VADDR..KLINER_OFFSET).contains(&p.as_usize()) {
-            PhysAddr::from_usize(p.as_usize() - KIMAGE_VADDR)
+            PhysAddr::from_usize(p.as_usize() - va_offset())
         } else {
             PhysAddr::from_usize(p.as_usize() - KLINER_OFFSET)
         }
@@ -94,7 +114,7 @@ fn kimage_range_phys() -> Range<PhysAddr> {
         fn _ekernel();
     }
 
-    let start = PhysAddr::from_usize(_skernel as usize - KIMAGE_VADDR);
-    let end = PhysAddr::from_usize(_ekernel as usize - KIMAGE_VADDR);
+    let start = PhysAddr::from_usize(KIMAGE_VADDR - va_offset());
+    let end = PhysAddr::from_usize(_ekernel as usize - va_offset());
     start..end
 }
