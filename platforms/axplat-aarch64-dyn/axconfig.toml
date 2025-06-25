@@ -12,7 +12,7 @@ package = "axplat-aarch64-dyn"          # str
 # Platform family (deprecated).
 family = "" # str
 # Number of CPUs.
-cpu-num = 256                                   # uint
+cpu-num = 1                                   # uint
 # No need.
 phys-memory-base = 0                            # uint
 # No need.
