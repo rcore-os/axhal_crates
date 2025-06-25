@@ -69,6 +69,8 @@ impl InitIf for InitIfImpl {
     /// * Other platform devices are initialized.
     fn init_later(cpu_id: usize, arg: usize) {
         driver::setup();
+
+        driver::probe_all(true).unwrap();
     }
 
     /// Initializes the platform at the later stage for secondary cores.
