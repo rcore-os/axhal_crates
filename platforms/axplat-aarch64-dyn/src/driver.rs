@@ -1,8 +1,9 @@
 use core::ops::Deref;
 
 use pie_boot::boot_info;
+pub use rdrive::probe_all;
 use rdrive::{
-    Platform, init,
+    Platform, init, probe_pre_kernel,
     register::{DriverRegister, DriverRegisterSlice},
     register_append,
 };
@@ -13,6 +14,8 @@ pub fn setup() {
     init(Platform::Fdt { addr: fdt }).unwrap();
 
     register_append(&driver_registers());
+
+    probe_pre_kernel().unwrap();
 }
 
 fn driver_registers() -> impl Deref<Target = [DriverRegister]> {
