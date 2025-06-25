@@ -1,6 +1,6 @@
 use axplat::init::InitIf;
 
-use crate::console;
+use crate::{console, driver};
 
 struct InitIfImpl;
 
@@ -68,13 +68,11 @@ impl InitIf for InitIfImpl {
     /// * Timer interrupts are enabled (if applicable).
     /// * Other platform devices are initialized.
     fn init_later(cpu_id: usize, arg: usize) {
-       
+        driver::setup();
     }
 
     /// Initializes the platform at the later stage for secondary cores.
     ///
     /// See [`init_later`] for details.
-    fn init_later_secondary(cpu_id: usize) {
-         
-    }
+    fn init_later_secondary(cpu_id: usize) {}
 }

@@ -4,7 +4,7 @@ use axplat::mem::{MemIf, RawRange};
 use heapless::Vec;
 use memory_addr::{MemoryAddr, PhysAddr, VirtAddr};
 use pie_boot::{KIMAGE_VADDR, KLINER_OFFSET, MemoryRegionKind, boot_info};
-use spin::{Mutex, Once, RwLock};
+use spin::Once;
 
 struct MemIfImpl;
 
@@ -47,7 +47,7 @@ pub fn setup() {
                     MemoryRegionKind::Reserved | MemoryRegionKind::Bootloader
                 )
             })
-            .map(|one| (one.start, one.end - one.start))
+            .map(|one| (one.start, one.end.align_up_4k() - one.start))
         {
             let _ = ram_list.push(region);
         }
