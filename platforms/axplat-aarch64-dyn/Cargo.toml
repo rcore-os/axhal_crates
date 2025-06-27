@@ -19,6 +19,6 @@ heapless = "0.8"
 log = "0.4"
 memory_addr = "0.3"
 pie-boot = {version = "0.2.7"}
-rdrive = "0.14"
+rdrive = "0.15"
 smccc = "0.2"
 spin = "0.10"
