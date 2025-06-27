@@ -6,7 +6,7 @@ use axplat::power::PowerIf;
 use log::{debug, error};
 use rdrive::{
     DriverGeneric, KError, PlatformDevice, driver::power::Interface, module_driver,
-    register::FdtInfo,
+    probe::OnProbeError, register::FdtInfo,
 };
 use smccc::{Hvc, Smc, psci};
 use spin::Once;
@@ -95,11 +95,11 @@ impl Interface for Psci {
     }
 }
 
-fn probe(fdt: FdtInfo<'_>, _dev: PlatformDevice) -> Result<(), Box<dyn Error>> {
+fn probe(fdt: FdtInfo<'_>, _dev: PlatformDevice) -> Result<(), OnProbeError> {
     let method = fdt
         .node
         .find_property("method")
-        .ok_or("fdt no method property")?
+        .ok_or(OnProbeError::Other("fdt no method property".into()))?
         .str();
     let method = Method::try_from(method)?;
     METHOD.call_once(|| method);
