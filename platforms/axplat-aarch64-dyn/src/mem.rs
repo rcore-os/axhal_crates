@@ -1,8 +1,8 @@
 use core::ops::Range;
 
-use axplat::mem::{MemIf, RawRange};
+use axplat::mem::{MemIf, PhysAddr, RawRange, VirtAddr};
 use heapless::Vec;
-use memory_addr::{MemoryAddr, PhysAddr, VirtAddr};
+use memory_addr::MemoryAddr;
 use pie_boot::{KIMAGE_VADDR, KLINER_OFFSET, MemoryRegionKind, boot_info};
 use spin::Once;
 

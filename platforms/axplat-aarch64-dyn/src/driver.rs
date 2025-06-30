@@ -13,8 +13,6 @@ pub fn setup() {
 
     init(Platform::Fdt { addr: fdt }).unwrap();
 
-    register_append(&driver_registers());
-
     probe_pre_kernel().unwrap();
 }
 

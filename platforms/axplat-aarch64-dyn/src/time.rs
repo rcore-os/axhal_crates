@@ -27,7 +27,7 @@ impl TimeIf for TimeIfImpl {
     /// Return epoch offset in nanoseconds (wall time offset to monotonic
     /// clock start).
     fn epochoffset_nanos() -> u64 {
-        todo!()
+        0
     }
 
     /// Set a one-shot timer.
@@ -35,6 +35,14 @@ impl TimeIf for TimeIfImpl {
     /// A timer interrupt will be triggered at the specified monotonic time
     /// deadline (in nanoseconds).
     fn set_oneshot_timer(deadline_ns: u64) {
-        todo!()
+        let cnptct = CNTPCT_EL0.get();
+        let cnptct_deadline = Self::nanos_to_ticks(deadline_ns);
+        if cnptct < cnptct_deadline {
+            let interval = cnptct_deadline - cnptct;
+            debug_assert!(interval <= u32::MAX as u64);
+            CNTP_TVAL_EL0.set(interval);
+        } else {
+            CNTP_TVAL_EL0.set(0);
+        }
     }
 }
