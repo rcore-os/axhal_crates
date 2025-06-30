@@ -1,28 +1,75 @@
-use axplat::irq::{IrqHandler, IrqIf};
+use aarch64_cpu::registers::*;
+use axplat::irq::{HandlerTable, IrqHandler, IrqIf};
+use lazyinit::LazyInit;
+use log::{debug, trace, warn};
+use rdrive::{Device, driver::intc::*};
+
+const SPI_START: usize = 32;
+/// The maximum number of IRQs.
+const MAX_IRQ_COUNT: usize = 1024;
+
+fn is_irq_private(irq_num: usize) -> bool {
+    irq_num < SPI_START
+}
+
+// per-CPU, no lock
+static CPU_IF: LazyInit<local::Boxed> = LazyInit::new();
+static IRQ_HANDLER_TABLE: HandlerTable<MAX_IRQ_COUNT> = HandlerTable::new();
 
 struct IrqIfImpl;
 
 #[impl_plat_interface]
 impl IrqIf for IrqIfImpl {
     /// Enables or disables the given IRQ.
-    fn set_enable(irq: usize, enabled: bool) {
-        todo!()
+    fn set_enable(irq_raw: usize, enabled: bool) {
+        trace!("IRQ set enable: {:#x} {}", irq_raw, enabled);
+        let irq: IrqId = irq_raw.into();
+        if is_irq_private(irq_raw)
+            && let local::Capability::ConfigLocalIrq(c) = CPU_IF.capability()
+        {
+            if enabled {
+                c.irq_enable(irq).expect("failed to enable local IRQ");
+            } else {
+                c.irq_disable(irq).expect("failed to disable local IRQ");
+            }
+        } else {
+            let mut intc = get_gicd().lock().unwrap();
+            if enabled {
+                intc.irq_enable(irq).expect("failed to enable IRQ");
+            } else {
+                intc.irq_disable(irq).expect("failed to disable IRQ");
+            }
+
+            if !is_irq_private(irq_raw) {
+                // For private IRQs, we need to acknowledge the interrupt
+                // controller.
+                intc.set_target_cpu(irq, current_cpu().into());
+            }
+        }
     }
 
     /// Registers an IRQ handler for the given IRQ.
     ///
     /// It also enables the IRQ if the registration succeeds. It returns `false`
     /// if the registration failed.
-    fn register(irq: usize, handler: IrqHandler) -> bool {
-        todo!()
+    fn register(irq_num: usize, handler: IrqHandler) -> bool {
+        trace!("register handler IRQ {}", irq_num);
+        if IRQ_HANDLER_TABLE.register_handler(irq_num, handler) {
+            Self::set_enable(irq_num, true);
+            return true;
+        }
+        warn!("register handler for IRQ {} failed", irq_num);
+        false
     }
 
     /// Unregisters the IRQ handler for the given IRQ.
     ///
     /// It also disables the IRQ if the unregistration succeeds. It returns the
     /// existing handler if it is registered, `None` otherwise.
-    fn unregister(irq: usize) -> Option<IrqHandler> {
-        todo!()
+    fn unregister(irq_num: usize) -> Option<IrqHandler> {
+        trace!("unregister handler IRQ {}", irq_num);
+        Self::set_enable(irq_num, false);
+        IRQ_HANDLER_TABLE.unregister_handler(irq_num)
     }
 
     /// Handles the IRQ.
@@ -30,7 +77,41 @@ impl IrqIf for IrqIfImpl {
     /// It is called by the common interrupt handler. It should look up in the
     /// IRQ handler table and calls the corresponding handler. If necessary, it
     /// also acknowledges the interrupt controller after handling.
-    fn handle(irq: usize) {
-        todo!()
+    fn handle(_unused: usize) {
+        let Some(irq) = CPU_IF.ack() else {
+            return;
+        };
+        let irq_num: usize = irq.into();
+        trace!("IRQ {}", irq_num);
+        if !IRQ_HANDLER_TABLE.handle(irq_num as _) {
+            warn!("Unhandled IRQ {}", irq_num);
+        }
+
+        CPU_IF.eoi(irq);
+        if CPU_IF.get_eoi_mode() {
+            CPU_IF.dir(irq);
+        }
     }
+}
+
+pub(crate) fn init() {
+    let intc = get_gicd();
+    intc.lock().unwrap().open().unwrap();
+    debug!("GICD initialized");
+}
+
+pub(crate) fn init_current_cpu() {
+    let intc = rdrive::get_one::<Intc>().expect("no interrupt controller found");
+    let cpu_if = intc.lock().unwrap().cpu_local().unwrap();
+    cpu_if.set_eoi_mode(true);
+    CPU_IF.init_once(cpu_if);
+    debug!("GIC initialized for current CPU");
+}
+
+fn get_gicd() -> Device<Intc> {
+    rdrive::get_one().expect("no interrupt controller found")
+}
+
+fn current_cpu() -> usize {
+    MPIDR_EL1.get() as usize & 0xffffff
 }

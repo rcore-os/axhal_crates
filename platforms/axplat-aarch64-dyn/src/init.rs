@@ -39,6 +39,7 @@ impl InitIf for InitIfImpl {
     /// Initializes the platform at the early stage for secondary cores.
     ///
     /// See [`init_early`] for details.
+    #[cfg(feature = "smp")]
     fn init_early_secondary(cpu_id: usize) {
         axcpu::init::init_trap();
     }
@@ -69,12 +70,15 @@ impl InitIf for InitIfImpl {
     /// * Other platform devices are initialized.
     fn init_later(cpu_id: usize, arg: usize) {
         driver::setup();
-
-        driver::probe_all(true).unwrap();
+        crate::irq::init();
+        crate::irq::init_current_cpu();
     }
 
     /// Initializes the platform at the later stage for secondary cores.
     ///
     /// See [`init_later`] for details.
-    fn init_later_secondary(cpu_id: usize) {}
+    #[cfg(feature = "smp")]
+    fn init_later_secondary(cpu_id: usize) {
+        crate::irq::init_current_cpu();
+    }
 }
