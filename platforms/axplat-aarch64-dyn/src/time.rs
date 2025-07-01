@@ -69,7 +69,6 @@ pub fn enable_irqs() {
     CNTP_TVAL_EL0.set(0);
     crate::irq::set_enable(
         TIMER_IRQ_CONFIG.irq.into(),
-        true,
         Some(TIMER_IRQ_CONFIG.trigger),
         false,
     );
