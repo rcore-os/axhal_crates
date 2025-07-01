@@ -1,4 +1,6 @@
 use aarch64_cpu::registers::*;
+use alloc::{format, string::String};
+
 use axplat::irq::{HandlerTable, IrqHandler, IrqIf};
 use lazyinit::LazyInit;
 use log::{debug, trace, warn};
@@ -22,30 +24,7 @@ struct IrqIfImpl;
 impl IrqIf for IrqIfImpl {
     /// Enables or disables the given IRQ.
     fn set_enable(irq_raw: usize, enabled: bool) {
-        trace!("IRQ set enable: {:#x} {}", irq_raw, enabled);
-        let irq: IrqId = irq_raw.into();
-        if is_irq_private(irq_raw)
-            && let local::Capability::ConfigLocalIrq(c) = CPU_IF.capability()
-        {
-            if enabled {
-                c.irq_enable(irq).expect("failed to enable local IRQ");
-            } else {
-                c.irq_disable(irq).expect("failed to disable local IRQ");
-            }
-        } else {
-            let mut intc = get_gicd().lock().unwrap();
-            if enabled {
-                intc.irq_enable(irq).expect("failed to enable IRQ");
-            } else {
-                intc.irq_disable(irq).expect("failed to disable IRQ");
-            }
-
-            if !is_irq_private(irq_raw) {
-                // For private IRQs, we need to acknowledge the interrupt
-                // controller.
-                intc.set_target_cpu(irq, current_cpu().into());
-            }
-        }
+        set_enable(irq_raw, is_irq_private(irq_raw), None, enabled);
     }
 
     /// Registers an IRQ handler for the given IRQ.
@@ -96,13 +75,15 @@ impl IrqIf for IrqIfImpl {
 
 pub(crate) fn init() {
     let intc = get_gicd();
+    debug!("Initializing GICD...");
     intc.lock().unwrap().open().unwrap();
     debug!("GICD initialized");
 }
 
 pub(crate) fn init_current_cpu() {
     let intc = rdrive::get_one::<Intc>().expect("no interrupt controller found");
-    let cpu_if = intc.lock().unwrap().cpu_local().unwrap();
+    let mut cpu_if = intc.lock().unwrap().cpu_local().unwrap();
+    cpu_if.open().unwrap();
     cpu_if.set_eoi_mode(true);
     CPU_IF.init_once(cpu_if);
     debug!("GIC initialized for current CPU");
@@ -114,4 +95,52 @@ fn get_gicd() -> Device<Intc> {
 
 fn current_cpu() -> usize {
     MPIDR_EL1.get() as usize & 0xffffff
+}
+
+pub(crate) fn set_enable(
+    irq_raw: usize,
+    is_private: bool,
+    trigger: Option<Trigger>,
+    enabled: bool,
+) {
+    debug!(
+        "IRQ({:#x}) set enable: {}, {}",
+        irq_raw,
+        enabled,
+        match trigger {
+            Some(t) => format!("trigger: {:?}", t),
+            None => String::new(),
+        }
+    );
+    let irq: IrqId = irq_raw.into();
+    if is_irq_private(irq_raw)
+        && let local::Capability::ConfigLocalIrq(c) = CPU_IF.capability()
+    {
+        if enabled {
+            c.irq_enable(irq).expect("failed to enable local IRQ");
+        } else {
+            c.irq_disable(irq).expect("failed to disable local IRQ");
+        }
+        if let Some(t) = trigger {
+            c.set_trigger(irq, t)
+                .expect("failed to set local IRQ trigger");
+        }
+    } else {
+        let mut intc = get_gicd().lock().unwrap();
+        if enabled {
+            intc.irq_enable(irq).expect("failed to enable IRQ");
+            if !is_irq_private(irq_raw) {
+                // For private IRQs, we need to acknowledge the interrupt
+                // controller.
+                intc.set_target_cpu(irq, current_cpu().into());
+            }
+
+            if let Some(t) = trigger {
+                intc.set_trigger(irq, t).expect("failed to set IRQ trigger");
+            }
+        } else {
+            intc.irq_disable(irq).expect("failed to disable IRQ");
+        }
+    }
+    debug!("IRQ({:#x}) set enable done", irq_raw);
 }

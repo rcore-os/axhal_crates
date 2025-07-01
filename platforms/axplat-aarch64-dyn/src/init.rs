@@ -70,8 +70,12 @@ impl InitIf for InitIfImpl {
     /// * Other platform devices are initialized.
     fn init_later(cpu_id: usize, arg: usize) {
         driver::setup();
-        crate::irq::init();
-        crate::irq::init_current_cpu();
+        #[cfg(feature = "irq")]
+        {
+            crate::irq::init();
+            crate::irq::init_current_cpu();
+            crate::time::enable_irqs();
+        }
     }
 
     /// Initializes the platform at the later stage for secondary cores.
@@ -79,6 +83,10 @@ impl InitIf for InitIfImpl {
     /// See [`init_later`] for details.
     #[cfg(feature = "smp")]
     fn init_later_secondary(cpu_id: usize) {
-        crate::irq::init_current_cpu();
+        #[cfg(feature = "irq")]
+        {
+            crate::irq::init_current_cpu();
+            crate::time::enable_irqs();
+        }
     }
 }

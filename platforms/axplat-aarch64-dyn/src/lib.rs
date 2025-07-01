@@ -10,6 +10,7 @@ use pie_boot::BootInfo;
 mod console;
 mod driver;
 mod init;
+#[cfg(feature = "irq")]
 mod irq;
 mod mem;
 mod power;
