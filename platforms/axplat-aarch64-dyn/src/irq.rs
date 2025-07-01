@@ -24,7 +24,7 @@ struct IrqIfImpl;
 impl IrqIf for IrqIfImpl {
     /// Enables or disables the given IRQ.
     fn set_enable(irq_raw: usize, enabled: bool) {
-        set_enable(irq_raw, is_irq_private(irq_raw), None, enabled);
+        set_enable(irq_raw, None, enabled);
     }
 
     /// Registers an IRQ handler for the given IRQ.
@@ -99,7 +99,6 @@ fn current_cpu() -> usize {
 
 pub(crate) fn set_enable(
     irq_raw: usize,
-    is_private: bool,
     trigger: Option<Trigger>,
     enabled: bool,
 ) {
