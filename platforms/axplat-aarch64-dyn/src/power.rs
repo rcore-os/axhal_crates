@@ -4,10 +4,7 @@ use aarch64_cpu::asm::wfi;
 use alloc::{boxed::Box, format};
 use axplat::power::PowerIf;
 use log::{debug, error};
-use rdrive::{
-    DriverGeneric, KError, PlatformDevice, driver::power::Interface, module_driver,
-    probe::OnProbeError, register::FdtInfo,
-};
+use rdrive::{PlatformDevice, module_driver, probe::OnProbeError, register::FdtInfo};
 use smccc::{Hvc, Smc, psci};
 use spin::Once;
 
@@ -67,31 +64,6 @@ impl TryFrom<&str> for Method {
             "smc" => Ok(Method::Smc),
             "hvc" => Ok(Method::Hvc),
             _ => Err(format!("method [{value}] not support").into()),
-        }
-    }
-}
-
-struct Psci {
-    method: Method,
-}
-
-impl DriverGeneric for Psci {
-    fn open(&mut self) -> Result<(), KError> {
-        Ok(())
-    }
-
-    fn close(&mut self) -> Result<(), KError> {
-        Ok(())
-    }
-}
-
-impl Interface for Psci {
-    fn shutdown(&mut self) {
-        if let Err(e) = match self.method {
-            Method::Smc => psci::system_off::<Smc>(),
-            Method::Hvc => psci::system_off::<Hvc>(),
-        } {
-            error!("shutdown failed: {}", e);
         }
     }
 }

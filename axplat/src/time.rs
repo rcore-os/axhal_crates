@@ -41,6 +41,9 @@ pub trait TimeIf {
     /// deadline (in nanoseconds).
     #[cfg(feature = "irq")]
     fn set_oneshot_timer(deadline_ns: u64);
+
+    #[cfg(feature = "irq")]
+    fn irq_num()->usize;
 }
 
 /// Returns nanoseconds elapsed since system boot.
