@@ -25,7 +25,7 @@ heapless = "0.8"
 lazyinit = "0.2"
 log = "0.4"
 memory_addr = "0.3"
-pie-boot = {version = "0.2.9"}
+pie-boot = {version = "0.2.12"}
 rdrive = "0.15"
 smccc = "0.2"
 spin = "0.10"
