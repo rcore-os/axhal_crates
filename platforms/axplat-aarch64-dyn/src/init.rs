@@ -1,6 +1,6 @@
 use axplat::init::InitIf;
 
-use crate::{console, driver};
+use crate::{cache, console, driver};
 
 struct InitIfImpl;
 
@@ -69,6 +69,7 @@ impl InitIf for InitIfImpl {
     /// * Timer interrupts are enabled (if applicable).
     /// * Other platform devices are initialized.
     fn init_later(cpu_id: usize, arg: usize) {
+        unsafe { cache::dcache_all(cache::DcacheOp::CleanAndInvalidate) };
         driver::setup();
         #[cfg(feature = "irq")]
         {
@@ -83,6 +84,7 @@ impl InitIf for InitIfImpl {
     /// See [`init_later`] for details.
     #[cfg(feature = "smp")]
     fn init_later_secondary(cpu_id: usize) {
+        unsafe { cache::dcache_all(cache::DcacheOp::CleanAndInvalidate) };
         #[cfg(feature = "irq")]
         {
             crate::irq::init_current_cpu();
