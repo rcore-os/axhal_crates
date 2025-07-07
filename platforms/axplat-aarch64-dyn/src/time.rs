@@ -52,11 +52,6 @@ impl TimeIf for TimeIfImpl {
             CNTP_TVAL_EL0.set(0);
         }
     }
-
-    #[cfg(feature = "irq")]
-    fn irq_num() -> usize {
-        TIMER_IRQ_CONFIG.irq.into()
-    }
 }
 
 #[cfg(feature = "irq")]
@@ -65,13 +60,18 @@ impl TimeIf for TimeIfImpl {
 /// It should be called on all CPUs, as the timer interrupt is a PPI (Private
 /// Peripheral Interrupt).
 pub fn enable_irqs() {
+    use crate::config::devices::TIMER_IRQ;
+
     CNTP_CTL_EL0.write(CNTP_CTL_EL0::ENABLE::SET);
     CNTP_TVAL_EL0.set(0);
-    crate::irq::set_enable(
-        TIMER_IRQ_CONFIG.irq.into(),
-        Some(TIMER_IRQ_CONFIG.trigger),
-        false,
+    let irq_raw: usize = TIMER_IRQ_CONFIG.irq.into();
+
+    assert_eq!(
+        irq_raw, TIMER_IRQ,
+        "axconfig.toml `timer-irq` must match the IRQ number used in the driver"
     );
+
+    crate::irq::set_enable(irq_raw, Some(TIMER_IRQ_CONFIG.trigger), false);
 }
 
 module_driver!(
