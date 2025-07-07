@@ -44,7 +44,7 @@ pub fn setup() {
         let head_start = boot_info().kimage_start_lma as usize;
         let head_section = (head_start, (_skernel as usize) - va_offset() - head_start);
 
-        rsv_list.push(head_section);
+        rsv_list.push(head_section).unwrap();
 
         for region in boot_info()
             .memory_regions
