@@ -15,6 +15,7 @@ smp = ["axplat/smp"]
 
 [dependencies]
 aarch64-cpu = "10"
+aarch64-cpu-ext = "0.1"
 any-uart = "0.2.11"
 axconfig-macros = "0.2"
 axcpu = {workspace = true}

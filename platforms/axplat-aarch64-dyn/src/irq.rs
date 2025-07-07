@@ -85,7 +85,7 @@ pub(crate) fn init_current_cpu() {
     let mut cpu_if = intc.lock().unwrap().cpu_local().unwrap();
     cpu_if.open().unwrap();
     cpu_if.set_eoi_mode(true);
-    CPU_IF.init_once(cpu_if);
+    CPU_IF.call_once(move || cpu_if);
     debug!("GIC initialized for current CPU");
 }
 
@@ -97,11 +97,7 @@ fn current_cpu() -> usize {
     MPIDR_EL1.get() as usize & 0xffffff
 }
 
-pub(crate) fn set_enable(
-    irq_raw: usize,
-    trigger: Option<Trigger>,
-    enabled: bool,
-) {
+pub(crate) fn set_enable(irq_raw: usize, trigger: Option<Trigger>, enabled: bool) {
     debug!(
         "IRQ({:#x}) set enable: {}, {}",
         irq_raw,
@@ -131,7 +127,7 @@ pub(crate) fn set_enable(
             if !is_irq_private(irq_raw) {
                 // For private IRQs, we need to acknowledge the interrupt
                 // controller.
-                intc.set_target_cpu(irq, current_cpu().into());
+                intc.set_target_cpu(irq, current_cpu().into()).unwrap();
             }
 
             if let Some(t) = trigger {

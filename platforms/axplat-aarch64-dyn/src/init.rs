@@ -1,6 +1,7 @@
+use aarch64_cpu_ext::cache::{CacheOp, dcache_all};
 use axplat::init::InitIf;
 
-use crate::{cache, console, driver};
+use crate::{console, driver};
 
 struct InitIfImpl;
 
@@ -30,7 +31,7 @@ impl InitIf for InitIfImpl {
     /// * Exception & interrupt handlers are set up.
     /// * Early console is initialized.
     /// * Current monotonic time and wall time can be obtained.
-    fn init_early(cpu_id: usize, arg: usize) {
+    fn init_early(_cpu_id: usize, _arg: usize) {
         axcpu::init::init_trap();
         crate::mem::setup();
         console::setup_early();
@@ -40,7 +41,7 @@ impl InitIf for InitIfImpl {
     ///
     /// See [`init_early`] for details.
     #[cfg(feature = "smp")]
-    fn init_early_secondary(cpu_id: usize) {
+    fn init_early_secondary(_cpu_id: usize) {
         axcpu::init::init_trap();
     }
 
@@ -68,8 +69,10 @@ impl InitIf for InitIfImpl {
     /// * Interrupt controller is initialized (if applicable).
     /// * Timer interrupts are enabled (if applicable).
     /// * Other platform devices are initialized.
-    fn init_later(cpu_id: usize, arg: usize) {
-        unsafe { cache::dcache_all(cache::DcacheOp::CleanAndInvalidate) };
+    fn init_later(_cpu_id: usize, _arg: usize) {
+        dcache_all(CacheOp::CleanAndInvalidate);
+        #[cfg(feature = "smp")]
+        crate::smp::init();
         driver::setup();
         #[cfg(feature = "irq")]
         {
@@ -83,8 +86,8 @@ impl InitIf for InitIfImpl {
     ///
     /// See [`init_later`] for details.
     #[cfg(feature = "smp")]
-    fn init_later_secondary(cpu_id: usize) {
-        unsafe { cache::dcache_all(cache::DcacheOp::CleanAndInvalidate) };
+    fn init_later_secondary(_cpu_id: usize) {
+        dcache_all(CacheOp::CleanAndInvalidate);
         #[cfg(feature = "irq")]
         {
             crate::irq::init_current_cpu();

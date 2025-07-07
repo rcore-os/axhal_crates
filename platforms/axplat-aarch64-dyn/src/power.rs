@@ -20,8 +20,18 @@ impl PowerIf for PowerImpl {
     /// Where `cpu_id` is the logical CPU ID (0, 1, ..., N-1, N is the number of
     /// CPU cores on the platform).
     #[cfg(feature = "smp")]
-    fn cpu_boot(cpu_id: usize, stack_top_paddr: usize) {
-        todo!()
+    fn cpu_boot(cpu_idx: usize, stack_top_paddr: usize) {
+        use aarch64_cpu_ext::cache::{CacheOp, dcache_all};
+        use log::info;
+
+        let cpu_id = crate::smp::cpu_idx_to_id(cpu_idx);
+        let entry = crate::smp::secondary_entry_phys_addr();
+        info!(
+            "booting CPU {cpu_id} with entry {:#x} and stack top {:#x}",
+            entry, stack_top_paddr
+        );
+        dcache_all(CacheOp::CleanAndInvalidate);
+        cpu_on(cpu_id as _, entry.as_usize() as _, stack_top_paddr as _).unwrap();
     }
 
     /// Shutdown the whole system.
@@ -82,15 +92,11 @@ fn probe(fdt: FdtInfo<'_>, _dev: PlatformDevice) -> Result<(), OnProbeError> {
     Ok(())
 }
 
-// fn cpu_on(
-//     cpu_id: CpuId,
-//     entry: usize,
-//     stack_top: PhysAddr,
-// ) -> Result<(), alloc::boxed::Box<dyn Error>> {
-//     let method = *METHOD;
-//     match method {
-//         Method::Smc => psci::cpu_on::<Smc>(cpu_id.raw() as _, entry as _, stack_top.raw() as _)?,
-//         Method::Hvc => psci::cpu_on::<Hvc>(cpu_id.raw() as _, entry as _, stack_top.raw() as _)?,
-//     };
-//     Ok(())
-// }
+fn cpu_on(cpu_id: u64, entry: u64, stack_top: u64) -> Result<(), alloc::boxed::Box<dyn Error>> {
+    let method = METHOD.wait();
+    match method {
+        Method::Smc => psci::cpu_on::<Smc>(cpu_id, entry, stack_top)?,
+        Method::Hvc => psci::cpu_on::<Hvc>(cpu_id, entry, stack_top)?,
+    };
+    Ok(())
+}
