@@ -27,8 +27,7 @@ impl PowerIf for PowerImpl {
         let cpu_id = crate::smp::cpu_idx_to_id(cpu_idx);
         let entry = crate::smp::secondary_entry_phys_addr();
         info!(
-            "booting CPU {cpu_id} with entry {:#x} and stack top {:#x}",
-            entry, stack_top_paddr
+            "booting CPU{cpu_idx} id {cpu_id:#x} with entry {entry:#x} and stack top {stack_top_paddr:#x}",
         );
         dcache_all(CacheOp::CleanAndInvalidate);
         cpu_on(cpu_id as _, entry.as_usize() as _, stack_top_paddr as _).unwrap();

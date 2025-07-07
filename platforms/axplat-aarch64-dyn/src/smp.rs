@@ -1,3 +1,4 @@
+use aarch64_cpu_ext::cache::{CacheOp, dcache_all};
 use alloc::vec::Vec;
 use axplat::mem::{PhysAddr, va, virt_to_phys};
 use fdt_parser::Status;
@@ -25,11 +26,11 @@ pub fn init() {
         ls
     });
 
-    debug!("CPU ID list: {:?}", CPU_ID_LIST.wait());
+    debug!("CPU ID list: {:#x?}", CPU_ID_LIST.wait());
 
     if CPU_ID_LIST.wait().len() < CPU_NUM {
         panic!(
-            "CPU count {} is less than expected `cpu_num` in `.axconfig.toml`{}",
+            "CPU count {} is less than expected `cpu_num` in `.axconfig.toml` is {}",
             CPU_ID_LIST.wait().len(),
             CPU_NUM
         );
@@ -37,7 +38,7 @@ pub fn init() {
 
     if CPU_ID_LIST.wait().len() > CPU_NUM {
         info!(
-            "CPU count {} is more than expected `cpu_num` in `.axconfig.toml`{}",
+            "CPU count {} is more than expected `cpu_num` in `.axconfig.toml` is {}",
             CPU_ID_LIST.wait().len(),
             CPU_NUM
         );
@@ -128,6 +129,7 @@ unsafe extern "C" fn _start_secondary() -> ! {
 }
 
 fn _secondary_main(cpu_id: usize) -> ! {
+    dcache_all(CacheOp::CleanAndInvalidate);
     let cpu_idx = cpu_id_to_idx(cpu_id);
     axplat::call_secondary_main(cpu_idx)
 }

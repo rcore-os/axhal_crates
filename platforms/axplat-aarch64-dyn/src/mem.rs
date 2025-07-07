@@ -36,7 +36,15 @@ pub fn setup() {
     });
 
     RESERVED_LIST.call_once(|| {
-        let mut ram_list = Vec::new();
+        let mut rsv_list = Vec::new();
+
+        unsafe extern "C" {
+            fn _skernel();
+        }
+        let head_start = boot_info().kimage_start_lma as usize;
+        let head_section = (head_start, (_skernel as usize) - va_offset() - head_start);
+
+        rsv_list.push(head_section);
 
         for region in boot_info()
             .memory_regions
@@ -49,9 +57,9 @@ pub fn setup() {
             })
             .map(|one| (one.start, one.end.align_up_4k() - one.start))
         {
-            let _ = ram_list.push(region);
+            let _ = rsv_list.push(region);
         }
-        ram_list
+        rsv_list
     });
 
     MMIO.call_once(|| {
@@ -110,11 +118,10 @@ impl MemIf for MemIfImpl {
 
 fn kimage_range_phys() -> Range<PhysAddr> {
     unsafe extern "C" {
-        fn _skernel();
         fn _ekernel();
     }
 
-    let start = PhysAddr::from_usize(KIMAGE_VADDR - va_offset());
+    let start = PhysAddr::from_usize(boot_info().kimage_start_lma as usize);
     let end = PhysAddr::from_usize(_ekernel as usize - va_offset());
     start..end
 }
